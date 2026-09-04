@@ -23,12 +23,31 @@ def post_install():
                                 p.unlink()
                             except Exception:
                                 pass
+                    # Windows CMD / BAT wrappers
                     for cmd_name in ["ae.cmd", "ae-cli.cmd", "ae.bat"]:
                         p = sdir / cmd_name
                         try:
                             p.write_text("@echo off\r\npython -m ae_cli.main %*\r\n", encoding="utf-8")
                         except Exception:
                             pass
+
+                    # Git Bash / POSIX shell wrappers
+                    for sh_name in ["ae", "ae-cli"]:
+                        p = sdir / sh_name
+                        try:
+                            p.write_text("#!/usr/bin/env bash\npython -m ae_cli.main \"$@\"\n", encoding="utf-8")
+                        except Exception:
+                            pass
+
+            # Automatically register alias in ~/.bashrc for Git Bash users
+            bashrc = Path.home() / ".bashrc"
+            try:
+                content = bashrc.read_text(encoding="utf-8") if bashrc.exists() else ""
+                if "alias ae=" not in content:
+                    with open(bashrc, "a", encoding="utf-8") as f:
+                        f.write("\n# ae-cli bash alias\nalias ae=\"python -m ae_cli.main\"\nalias ae-cli=\"python -m ae_cli.main\"\n")
+            except Exception:
+                pass
         except Exception:
             pass
 
