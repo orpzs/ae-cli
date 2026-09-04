@@ -19,10 +19,24 @@
 
 ### 1. Install (one-time setup)
 
+Clone the repository:
 ```bash
+git clone https://github.com/orpzs/ae-cli.git
 cd ae-cli
+```
+
+Install using **pip** or **uv**:
+
+**Using pip:**
+```bash
 pip install -e .
 ```
+
+**Using uv:**
+```bash
+uv pip install -e .
+```
+*(Or run directly without installing: `uv run ae`)*
 
 ### 2. Launch
 
