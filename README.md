@@ -2,8 +2,6 @@
 
 > **Real-Time Conversational Streaming CLI for Vertex AI Agent Engine**
 
----
-
 ```
      _    _____        ____ _     ___ 
     / \  | ____|      / ___| |   |_ _|
@@ -13,146 +11,83 @@
   Vertex AI Agent Engine Interactive Terminal
 ```
 
-`ae-cli` is a developer-centric command-line interface for conversing with deployed Google Cloud Vertex AI Agent Engines (Reasoning Engines). It brings the fluid streaming, reasoning thought blocks, tool call visualization, multi-turn session persistence, and slash commands of modern AI coding assistants straight to your terminal.
-
----
-
-## ✨ Features
-
-- 🔄 **Real-Time Streaming Output**: Streams tokens chunk-by-chunk over pure REST Server-Sent Events (SSE).
-- 🧠 **Thought & Reasoning Display**: Formats model thinking tokens in styled, collapsible thought blocks.
-- ⚙️ **Action & Tool Execution Visualizer**: Highlights function calls, arguments, and returned results in real time.
-- 💬 **Interactive REPL Session**: Conversational chat loop with command history, arrow key navigation, and slash commands.
-- 🗂️ **Multi-Turn Session Continuity**: Automatically manages session state on Vertex AI or resumes previous sessions.
-- 🛡️ **Enterprise Ready**: Built on pure HTTP/REST SSE streaming—completely immune to corporate Windows WDAC / AppLocker blocks on `cygrpc.pyd`.
-- 🔌 **Script & Pipeline Friendly**: Run single-shot queries (`ae query "..."`) or pipe input directly (`cat data.txt | ae query`).
+`ae-cli` is a command-line interface for conversing with deployed Google Cloud Vertex AI Agent Engines (Reasoning Engines). It brings real-time token streaming, model reasoning thought blocks, tool call visualization, multi-turn session persistence, and slash commands directly to your terminal.
 
 ---
 
 ## 🚀 Quickstart
 
-### 1. Installation
-
-Clone or navigate to the repository and install in editable mode:
+### 1. Install (one-time setup)
 
 ```bash
 cd ae-cli
 pip install -e .
 ```
 
-You can now run `ae` directly from any terminal or folder!
-
-### 2. Automated Pre-Setup (Zero-Config)
-
-When you first launch `ae-cli`, it automatically runs an interactive onboarding wizard that:
-1. Prompts and runs `gcloud auth login` and `gcloud auth application-default login`.
-2. Asks for your Google Cloud Project ID (auto-detecting your active `gcloud` project).
-3. Asks for your Vertex AI region/location (defaulting to `us-central1`).
-4. Automatically discovers deployed Agent Engines in your project and lets you select one from a numbered list.
-5. Saves your settings to `.env` and `~/.ae/config.json`.
-
-You can also trigger or re-run this setup at any time with:
-```bash
-ae setup
-```
-*(Or in Windows PowerShell: `.\ae.ps1 setup`)*
-
----
-
-## 📖 Usage
-
-### 1. Interactive Conversational Chat (Default)
-
-Launch the interactive chat terminal:
+### 2. Launch
 
 ```bash
-# Connect to agent by ID
-ae chat --engine 1234567890123456789
-
-# Or connect by Display Name
-ae chat --app "Transcript Summarizer"
-
-# Or simply run 'ae' if configured in .env
 ae
 ```
 
-### 2. Slash Commands in Interactive Mode
+### ⚡ Automated First-Time Setup
+When you run `ae` for the first time, it automatically guides you through:
+1. **Google Cloud Authentication**: Logs in via `gcloud auth login` and sets up Application Default Credentials (ADC).
+2. **Project & Region**: Selects your GCP Project ID and Vertex AI location.
+3. **Agent Engine Selection**: Discovers your deployed Agent Engines in Vertex AI and lets you select one from a numbered list.
 
-While inside the interactive chat loop, you can use built-in slash commands:
+Once completed, you are dropped directly into the conversational chat session!
+
+---
+
+## 📖 Commands
 
 | Command | Description |
 | :--- | :--- |
-| `/help` | Show available slash commands and keyboard shortcuts |
-| `/new` | Start a new clean conversation session on the Agent Engine |
-| `/session` | View current session ID, user ID, and turn count |
-| `/sessions` | List all locally saved sessions for this agent |
-| `/switch <id>` | Switch to an existing conversation session |
-| `/history` | View message history of the current session |
-| `/info` | Inspect deployed Agent Engine metadata, specs, and requirements |
-| `/tools` | List registered tools and operations exposed by the agent |
-| `/thoughts` | Toggle visibility of model thinking/reasoning blocks |
-| `/raw` | Toggle raw JSON event streaming (useful for agent debugging) |
-| `/clear` | Clear terminal screen |
-| `/exit` or `/quit` | Cleanly exit the interactive session |
+| `ae` | Start interactive conversational chat session |
+| `ae list` | List all deployed Agent Engines in your project |
+| `ae query "prompt"` | Run a single query and stream response to stdout |
+| `ae info` | Inspect deployed Agent Engine specs and callable methods |
+| `ae sessions` | View saved conversation sessions |
+| `ae setup` | Re-run authentication and switch target project/agent |
+| `ae --version` | Show CLI version |
 
 ---
 
-### 3. Single-Query Mode (Pipeable)
+## 💬 Inside the Chat Terminal
 
-Execute a one-off query without entering the interactive loop:
+While chatting, you can use built-in slash commands:
+
+| Command | Description |
+| :--- | :--- |
+| `/help` | Show commands cheatsheet |
+| `/new` | Start a new clean session on the Agent Engine |
+| `/session` | View current session ID, user ID, and turn count |
+| `/sessions` | List saved sessions for this agent |
+| `/switch <id>` | Resume an existing conversation session |
+| `/history` | View message history of current session |
+| `/tools` | List tools and operations exposed by the agent |
+| `/thoughts` | Toggle visibility of model thinking/reasoning blocks |
+| `/raw` | Toggle raw JSON event stream (useful for debugging) |
+| `/setup` | Switch active project or agent engine |
+| `/clear` | Clear the terminal screen |
+| `/exit` or `/quit` | Exit the chat session |
+
+---
+
+## 🔌 Pipelines & Scripting
+
+Run one-off queries or pipe data directly through `ae`:
 
 ```bash
 # Direct argument query
-ae query "Summarize the latest sales report"
+ae query "Summarize the latest sales metrics"
 
-# Pipe input from a file or another command
+# Pipe from file or another CLI tool
 cat transcript.txt | ae query
 
-# Output raw JSON array of stream events
-ae query "Find discrepancies" --json
-```
-
----
-
-### 4. Agent Engine Management
-
-#### List Deployed Agent Engines
-```bash
-ae list
-```
-Displays a table with display names, resource IDs, creation times, and update timestamps.
-
-#### Inspect Agent Specifications
-```bash
-ae info 1234567890123456789
-```
-Displays deployment specs, python runtime, dependencies, and registered callable class methods.
-
-#### List Saved Conversation Sessions
-```bash
-ae sessions
-```
-
----
-
-## 🛠️ Architecture
-
-```
-ae-cli
-├── ae_cli/
-│   ├── client.py        # Vertex AI REST SSE Streaming Client & Event Normalizer
-│   ├── auth.py          # Google Cloud ADC, gcloud CLI, and Token Resolver
-│   ├── session.py       # Session State & Turn History Persistence
-│   ├── config.py        # Environment & CLI Configuration Loader
-│   ├── ui/
-│   │   ├── console.py   # Rich Console, ASCII Banners, and Alert Styling
-│   │   ├── renderer.py  # Real-Time Stream, Thought & Tool Call Renderer
-│   │   └── prompt.py    # prompt_toolkit REPL with History & Slash Commands
-│   └── commands/
-│       ├── chat.py      # Interactive Conversational Loop
-│       ├── query.py     # Single-Shot & Pipeable Query Handler
-│       ├── list_agents.py # Agent Engine Discovery
-│       └── info.py      # Agent Specification Inspector
+# Output raw JSON stream
+ae query "Analyze data" --json
 ```
 
 ---
