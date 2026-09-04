@@ -25,6 +25,7 @@ SLASH_COMMANDS = [
     "/tools",
     "/thoughts",
     "/raw",
+    "/setup",
     "/clear",
     "/exit",
     "/quit",

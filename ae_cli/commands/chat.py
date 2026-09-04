@@ -32,6 +32,7 @@ def print_help_menu():
         ("/tools", "List tools/operations exposed by the agent"),
         ("/thoughts", "Toggle visibility of model thinking/reasoning blocks"),
         ("/raw", "Toggle raw JSON event streaming (useful for debugging)"),
+        ("/setup", "Re-run Google Cloud authentication & agent setup wizard"),
         ("/clear", "Clear the terminal screen"),
         ("/exit or /quit", "Exit the interactive session"),
     ]
@@ -43,13 +44,30 @@ def print_help_menu():
     console.print("[dim]Tip: Use Up/Down arrows to navigate previous prompt history.[/dim]\n")
 
 
-def chat_command(config: AEConfig):
+def chat_command(config: AEConfig, force_setup: bool = False):
     """Starts the interactive chat loop with the deployed Agent Engine."""
+    from ae_cli.setup import run_setup, has_adc_credentials
+
+    # Automatic pre-setup check:
+    needs_setup = (
+        force_setup
+        or not has_adc_credentials()
+        or not config.project_id
+        or (not config.engine_id and not config.app_name)
+    )
+    if needs_setup:
+        config = run_setup(config)
+
     try:
         client = AgentEngineClient(config)
     except Exception as e:
-        print_error(str(e), title="Authentication / Config Error")
-        sys.exit(1)
+        console.print(f"[yellow]Authentication/Config issue ({e}). Launching setup wizard...[/yellow]")
+        config = run_setup(config)
+        try:
+            client = AgentEngineClient(config)
+        except Exception as e2:
+            print_error(str(e2), title="Initialization Error")
+            sys.exit(1)
 
     # Resolve target agent engine
     try:
@@ -265,6 +283,18 @@ def chat_command(config: AEConfig):
                 console.print(table)
             except Exception as e:
                 console.print(f"[red]Failed to fetch tools: {e}[/red]\n")
+            continue
+
+        elif lower_input == "/setup":
+            config = run_setup(config)
+            try:
+                client = AgentEngineClient(config)
+                engine_resource = client.resolve_engine()
+                engine_id = engine_resource.split("/")[-1]
+                prompt.update_session_id(config.session_id or "")
+                console.print(f"[green]✓ Setup updated. Active Agent:[/green] [bold white]{config.app_name or engine_id}[/bold white]\n")
+            except Exception as e:
+                console.print(f"[red]Setup error: {e}[/red]\n")
             continue
 
         # Standard conversation turn

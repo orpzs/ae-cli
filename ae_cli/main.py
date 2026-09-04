@@ -24,13 +24,15 @@ from ae_cli.session import SessionManager
 @click.option("--token", "-t", help="OAuth2 Access Token override")
 @click.option("--no-thoughts", is_flag=True, help="Hide model thinking/reasoning blocks")
 @click.option("--raw", is_flag=True, help="Stream raw event JSON payloads")
+@click.option("--setup", "force_setup", is_flag=True, help="Run Google Cloud authentication & agent setup wizard")
 @click.pass_context
-def cli(ctx, project, location, engine, app, user, session, token, no_thoughts, raw):
+def cli(ctx, project, location, engine, app, user, session, token, no_thoughts, raw, force_setup):
     """ae-cli - Real-time conversational CLI for Vertex AI Agent Engine.
 
     Run interactively in conversational mode or pipe queries directly.
     """
     ctx.ensure_object(dict)
+    ctx.obj["force_setup"] = force_setup
     ctx.obj["config"] = AEConfig.load(
         project_id=project,
         location=location,
@@ -46,12 +48,25 @@ def cli(ctx, project, location, engine, app, user, session, token, no_thoughts, 
         ctx.invoke(chat)
 
 
+@cli.command("setup")
+@click.pass_context
+def setup_cmd(ctx):
+    """Run interactive Google Cloud authentication and Agent Engine setup wizard."""
+    from ae_cli.setup import run_setup
+    config: AEConfig = ctx.obj["config"]
+    updated_config = run_setup(config)
+    start_chat = input("Start interactive chat session now? [Y/n]: ").strip().lower()
+    if start_chat not in ("n", "no"):
+        chat_command(updated_config)
+
+
 @cli.command("chat")
 @click.pass_context
 def chat(ctx):
     """Start interactive conversational chat session (default mode)."""
     config: AEConfig = ctx.obj["config"]
-    chat_command(config)
+    force_setup: bool = ctx.obj.get("force_setup", False)
+    chat_command(config, force_setup=force_setup)
 
 
 @cli.command("query")

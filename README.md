@@ -42,29 +42,20 @@ pip install -e .
 
 > **Windows Tip**: On machines with Windows Defender Application Control (WDAC), you can run via `.\ae.bat`, `.\ae.ps1`, or `python -m ae_cli.main`.
 
-### 2. Configuration
+### 2. Automated Pre-Setup (Zero-Config)
 
-Set your Google Cloud project and region via environment variables or a `.env` file:
+When you first launch `ae-cli`, it automatically runs an interactive onboarding wizard that:
+1. Prompts and runs `gcloud auth login` and `gcloud auth application-default login`.
+2. Asks for your Google Cloud Project ID (auto-detecting your active `gcloud` project).
+3. Asks for your Vertex AI region/location (defaulting to `us-central1`).
+4. Automatically discovers deployed Agent Engines in your project and lets you select one from a numbered list.
+5. Saves your settings to `.env` and `~/.ae/config.json`.
 
+You can also trigger or re-run this setup at any time with:
 ```bash
-cp .env.example .env
+ae setup
 ```
-
-Edit `.env`:
-```dotenv
-GOOGLE_CLOUD_PROJECT=your-gcp-project-id
-GOOGLE_CLOUD_LOCATION=us-central1
-
-# Optional: default target agent
-AGENT_ENGINE_ID=1234567890123456789
-# or match by display name:
-APP_NAME=Transcript Summarizer
-```
-
-Ensure you have Google Cloud credentials:
-```bash
-gcloud auth application-default login
-```
+*(Or in Windows PowerShell: `.\ae.ps1 setup`)*
 
 ---
 
