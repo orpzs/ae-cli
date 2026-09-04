@@ -1,6 +1,6 @@
 """
 ae-cli - A streaming CLI interface for Vertex AI Agent Engine.
-Interact and converse with deployed Agent Engines similar to Antigravity and Jetski CLIs.
+Interact and converse with deployed Agent Engines directly from the terminal.
 """
 
 __version__ = "0.1.0"

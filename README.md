@@ -1,7 +1,6 @@
 # ae-cli ⚡
 
-> **Real-Time Conversational Streaming CLI for Vertex AI Agent Engine**  
-> Inspired by the interactive terminal experiences of **Antigravity CLI** and **Jetski CLI**.
+> **Real-Time Conversational Streaming CLI for Vertex AI Agent Engine**
 
 ---
 

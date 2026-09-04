@@ -28,7 +28,7 @@ from ae_cli.session import SessionManager
 def cli(ctx, project, location, engine, app, user, session, token, no_thoughts, raw):
     """ae-cli - Real-time conversational CLI for Vertex AI Agent Engine.
 
-    Run interactively (Antigravity/Jetski style) or pipe queries directly.
+    Run interactively in conversational mode or pipe queries directly.
     """
     ctx.ensure_object(dict)
     ctx.obj["config"] = AEConfig.load(

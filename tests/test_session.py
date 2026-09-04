@@ -3,10 +3,20 @@
 import unittest
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 from ae_cli.session import SessionManager, ConversationTurn
 
 
 class TestSession(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.patcher = patch("ae_cli.session.SESSIONS_DIR", Path(self.temp_dir.name))
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+        self.temp_dir.cleanup()
+
     def test_session_turns(self):
         mgr = SessionManager(session_id="test_sess_01", user_id="test_user", engine_id="engine_mock")
         self.assertEqual(mgr.state.turn_count, 0)

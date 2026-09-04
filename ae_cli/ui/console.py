@@ -26,7 +26,7 @@ def print_banner(
     session_id: Optional[str] = None,
     user_id: Optional[str] = None,
 ):
-    """Displays the Jetski/Antigravity inspired start banner and active session info."""
+    """Displays the terminal start banner and active session info."""
     title_text = Text()
     title_text.append(BANNER_ART.strip("\n"), style="bold cyan")
     title_text.append("\n  Vertex AI Agent Engine Interactive Terminal\n", style="bold white")
