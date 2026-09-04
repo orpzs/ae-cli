@@ -14,7 +14,11 @@ from ae_cli.commands.info import info_command
 from ae_cli.session import SessionManager
 
 
+from ae_cli import __version__
+
+
 @click.group(invoke_without_command=True)
+@click.version_option(__version__, "-v", "--version", message="ae-cli %(version)s")
 @click.option("--project", "-p", help="Google Cloud Project ID")
 @click.option("--location", "-l", help="Vertex AI region (default: us-central1)")
 @click.option("--engine", "-e", help="Agent Engine ID or full resource name")
