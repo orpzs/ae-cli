@@ -40,7 +40,7 @@ cd ae-cli
 pip install -e .
 ```
 
-> **Windows Tip**: On machines with Windows Defender Application Control (WDAC), you can run via `.\ae.bat`, `.\ae.ps1`, or `python -m ae_cli.main`.
+You can now run `ae` directly from any terminal or folder!
 
 ### 2. Automated Pre-Setup (Zero-Config)
 
